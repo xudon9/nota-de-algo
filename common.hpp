@@ -3,6 +3,9 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <utility>
+#include <stack>
+#include <queue>
 
 using std::cout;
 using std::cerr;
@@ -11,6 +14,9 @@ using std::vector;
 using std::string;
 using std::list;
 using std::map;
+using std::pair;
+using std::stack;
+using std::queue;
 
 #define EXPAND(x) x
 #define GET_MACRO(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME, ...) NAME
