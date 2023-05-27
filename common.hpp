@@ -67,3 +67,9 @@ inline std::ostream &operator<<(std::ostream &os, const std::map<K, V> &m)
     os << "\b\b]";
     return os;
 }
+
+template <typename T1, typename T2>
+inline std::ostream &operator<<(std::ostream &os, const std::pair<T1, T2> &p)
+{
+  return os << "Pair(" << p.first << ", " << p.second << ")";
+}
