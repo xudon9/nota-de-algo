@@ -1,13 +1,4 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <list>
-#include <map>
-#include <utility>
-#include <stack>
-#include <queue>
-#include <algorithm>
-#include <cassert>
+#include <bits/stdc++.h>
 
 using std::cout;
 using std::cerr;
