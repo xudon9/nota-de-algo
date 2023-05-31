@@ -30,3 +30,10 @@ public:
     return go(n);
   }
 };
+
+int main()
+{
+  Solution s;
+  auto w = s.winnerSquareGame(1);
+  return w;
+}
