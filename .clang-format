@@ -3,4 +3,4 @@ IndentWidth: 2
 AccessModifierOffset: -2
 AlignConsecutiveAssignments: None
 AlignConsecutiveDeclarations: None
-
+IndentPPDirectives: AfterHash

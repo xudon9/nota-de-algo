@@ -1,0 +1,65 @@
+#include "../../common.hpp"
+// https://leetcode.com/problems/number-of-increasing-paths-in-a-grid/description/
+
+class Solution {
+  static const int mod = 1e9 + 7;
+
+public:
+  static int countPaths(vector<vector<int>> &grid) {
+    const int nRow = grid.size(), nCol = grid[0].size(), nCell{nRow * nCol};
+    int *const buf = new int[nCell * 2];
+    int *dpOld = buf, *dpNew = buf + nCell;
+    std::fill(dpNew, dpNew + nCell, 1);
+    int result{}, nPath{nCell};
+#define G_AT(ptr, i, j) (ptr[(i)*nCol + (j)])
+#define OLD(i, j) G_AT(dpOld, (i), (j))
+#define NEW(i, j) G_AT(dpNew, (i), (j))
+
+    do {
+      result = (result + nPath) % mod;
+      nPath = 0;
+      /* swap */ {
+        int *tmp = dpNew;
+        dpNew = dpOld;
+        dpOld = tmp;
+      }
+      std::fill(dpNew, dpNew + nCell, 0);
+
+      for (int i{}; i < nRow; ++i) {
+        for (int j{}; j < nCol; ++j) {
+          int nOld{OLD(i, j)};
+          if (nOld == 0)
+            // TODO: What if modulo hit zero?
+            continue;
+#define CHECK(boundPred, in, jn)                                               \
+  if ((boundPred) && grid[in][jn] > grid[i][j]) {                              \
+    (NEW((in), (jn)) += nOld) %= mod;                                          \
+    (nPath += nOld) %= mod;                                                    \
+  }
+          CHECK(i > 0, i - 1, j);
+          CHECK(i + 1 < nRow, i + 1, j);
+          CHECK(j > 0, i, j - 1);
+          CHECK(j + 1 < nCol, i, j + 1);
+        }
+      }
+      // DEBUG(nPath);
+    } while (nPath);
+#undef G_AT
+#undef OLD
+#undef NEW
+#undef CHECK
+    delete[] buf;
+    return result;
+  }
+};
+
+int main(int argc, char *argv[]) {
+  std::vector<std::vector<int>> grid1{{1, 1}, {3, 4}};
+  std::vector<std::vector<int>> grid2{{1}, {2}};
+  Solution s;
+  auto n1 = s.countPaths(grid1);
+  DEBUG(n1);
+  auto n2 = s.countPaths(grid2);
+  DEBUG(n2);
+  return 0;
+}
