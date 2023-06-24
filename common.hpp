@@ -25,7 +25,7 @@ using std::vector;
 #define PASTE10(func, v1, ...) PASTE1(func, v1) PASTE9(func, __VA_ARGS__)
 // Add more if you need more than 8 parameters
 #define ACTION(x)                                                              \
-  { std::cerr << #x << "=" << x << ", "; }
+  { std::cerr << #x << "=" << (x) << ", "; }
 
 #define DEBUG(...)                                                             \
   do {                                                                         \
@@ -43,16 +43,25 @@ inline std::ostream &operator<<(std::ostream &os, const std::vector<T> &v) {
   return os << (v.empty() ? "" : "\b\b") << "]";
 }
 
+template <typename V>
+inline std::ostream &operator<<(std::ostream &os, const std::set<V> &m) {
+  os << "set[";
+  for (auto &p : m) {
+    os << p << ", ";
+  }
+  return os << (m.size() ? "\b\b" : "") << "]";
+}
+
 template <typename K, typename V>
 inline std::ostream &operator<<(std::ostream &os, const std::map<K, V> &m) {
   os << "map[";
   for (auto &p : m) {
-    os << p.first << ": " << p.second << ", ";
+    os << p.first << ":" << p.second << ", ";
   }
-  return os << (m.size() ? "" : "\b\b") << "]";
+  return os << (m.size() ? "\b\b" : "") << "]";
 }
 
 template <typename T1, typename T2>
 inline std::ostream &operator<<(std::ostream &os, const std::pair<T1, T2> &p) {
-  return os << "Pair(" << p.first << ", " << p.second << ")";
+  return os << "(" << p.first << "," << p.second << ")";
 }
