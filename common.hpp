@@ -7,6 +7,82 @@ using std::printf;
 using std::string;
 using std::vector;
 
+template <typename T1, typename T2>
+inline std::ostream &operator<<(std::ostream &os, const std::pair<T1, T2> &p) {
+  return os << "(" << p.first << "," << p.second << ")";
+}
+
+template <typename T>
+inline std::ostream &operator<<(std::ostream &os, const std::vector<T> &v) {
+  os << "[" << v.size() << "; ";
+  auto it = v.begin(), ite = v.end();
+  for (; it != ite; ++it) {
+    os << *it << (std::next(it) == ite ? "]" : " ");
+  }
+  return os;
+}
+
+template <typename V>
+inline std::ostream &operator<<(std::ostream &os, const std::set<V> &m) {
+  os << "{" << m.size() << "; ";
+  auto it = m.begin(), ite = m.end();
+  for (; it != ite; ++it) {
+    os << *it << (std::next(it) == ite ? "}" : " ");
+  }
+  return os;
+}
+
+template <typename K, typename V>
+inline std::ostream &operator<<(std::ostream &os, const std::map<K, V> &m) {
+  os << "{" << m.size() << "; ";
+  auto it = m.begin(), ite = m.end();
+  for (; it != ite; ++it) {
+    os << it->first << ":" << it->second << (std::next(it) == ite ? "}" : " ");
+  }
+  return os;
+}
+
+std::string escapeString(const std::string &str) {
+  std::string escapedStr;
+  escapedStr.reserve(str.size());
+  for (char c : str) {
+    switch (c) {
+    case '\0':
+      escapedStr += "\\0";
+      break;
+    case '\\':
+      escapedStr += "\\\\";
+      break;
+    case '\"':
+      escapedStr += "\\\"";
+      break;
+    case '\'':
+      escapedStr += "\\\'";
+      break;
+    case '\t':
+      escapedStr += "\\t";
+      break;
+    case '\r':
+      escapedStr += "\\r";
+      break;
+    case '\n':
+      escapedStr += "\\n";
+      break;
+    default:
+      escapedStr += c;
+      break;
+    }
+  }
+  return escapedStr;
+}
+
+template <typename T> std::string printExprWithVal(const char *expr, T &&val) {
+  std::stringstream ss;
+  ss << val;
+  auto s{escapeString(ss.str())};
+  return s == expr ? s : expr + std::string("=") + s;
+}
+
 #define EXPAND(x) x
 #define GET_MACRO(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, NAME, ...) NAME
 #define PASTE(...)                                                             \
@@ -24,60 +100,25 @@ using std::vector;
 #define PASTE8(func, v1, ...) func(8, v1) PASTE7(func, __VA_ARGS__)
 #define PASTE9(func, v1, ...) func(9, v1) PASTE8(func, __VA_ARGS__)
 #define PASTE10(func, v1, ...) func(10, v1) PASTE9(func, __VA_ARGS__)
-// Add more if you need more than 8 parameters
+// Add more if you need more than 10 parameters
 #define ACTION_DECL(i, expr) const auto &_tmp##i{expr};
 #define ACTION_PRINT(i, x)                                                     \
-  { std::cerr << #x << "=" << (_tmp##i) << ", "; }
+  std::cerr << printExprWithVal(#x, _tmp##i) << (i == 1 ? "\n" : "  ");
 
 #define DEBUG(...)                                                             \
   do {                                                                         \
     EXPAND(PASTE(ACTION_DECL __VA_OPT__(, ) __VA_ARGS__))                      \
     std::cerr << "\033[34mDBG\033[0m " << __FILE__ << ":" << __LINE__ << ": "; \
     EXPAND(PASTE(ACTION_PRINT __VA_OPT__(, ) __VA_ARGS__))                     \
-    std::cerr << "\b\b  \n";                                                   \
   } while (0)
 
 #define TEST(lhs, rhs)                                                         \
   do {                                                                         \
     auto _v_lhs = (lhs);                                                       \
     auto _v_rhs = (rhs);                                                       \
-    if (_v_lhs == _v_rhs) {                                                    \
-      std::cout << "\033[32mPASS\033[0m " << #lhs "=" #rhs " = " << _v_lhs;    \
-    } else {                                                                   \
-      std::cout << "\033[31mFAIL\033[0m " << #lhs "=" << _v_lhs                \
-                << " /= " << #rhs "=" << _v_rhs;                               \
-    }                                                                          \
-    std::cout << std::endl;                                                    \
-  } while (0);
-
-template <typename T>
-inline std::ostream &operator<<(std::ostream &os, const std::vector<T> &v) {
-  os << "[";
-  for (auto &i : v) {
-    os << i << ", ";
-  }
-  return os << (v.empty() ? "" : "\b\b") << "]";
-}
-
-template <typename V>
-inline std::ostream &operator<<(std::ostream &os, const std::set<V> &m) {
-  os << "set[";
-  for (auto &p : m) {
-    os << p << ", ";
-  }
-  return os << (m.size() ? "\b\b" : "") << "]";
-}
-
-template <typename K, typename V>
-inline std::ostream &operator<<(std::ostream &os, const std::map<K, V> &m) {
-  os << "map[";
-  for (auto &p : m) {
-    os << p.first << ":" << p.second << ", ";
-  }
-  return os << (m.size() ? "\b\b" : "") << "]";
-}
-
-template <typename T1, typename T2>
-inline std::ostream &operator<<(std::ostream &os, const std::pair<T1, T2> &p) {
-  return os << "(" << p.first << "," << p.second << ")";
-}
+    bool equal = _v_lhs == _v_rhs;                                             \
+    std::cerr << (equal ? "\033[32mPASS\033[0m" : "\033[31mFAIL\033[0m")       \
+              << " " << printExprWithVal(#lhs, _v_lhs)                         \
+              << (equal ? " == " : " != ") << printExprWithVal(#rhs, _v_rhs)   \
+              << std::endl;                                                    \
+  } while (0)
