@@ -1,0 +1,3 @@
+(executable
+ (name func_chk)
+ (libraries core base))
