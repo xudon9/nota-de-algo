@@ -1,0 +1,3 @@
+(executable
+ (name eval_ex)
+ (libraries base stdio))
