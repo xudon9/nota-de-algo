@@ -1,0 +1,3 @@
+(executable
+ (name polygon_area)
+ (libraries core))
