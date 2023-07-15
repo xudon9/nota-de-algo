@@ -79,8 +79,14 @@ std::string escapeString(const std::string &str) {
 template <typename T> std::string printExprWithVal(const char *expr, T &&val) {
   std::stringstream ss;
   ss << val;
-  auto s{escapeString(ss.str())};
-  return s == expr ? s : expr + std::string("=") + s;
+  std::string s{ss.str()};
+  if (s == expr) {
+    return s;
+  }
+  std::string s2{"\"" + escapeString(s) + "\""};
+  if (s2 == expr)
+    return s;
+  return expr + std::string("=") + s;
 }
 
 #define EXPAND(x) x
@@ -103,7 +109,13 @@ template <typename T> std::string printExprWithVal(const char *expr, T &&val) {
 // Add more if you need more than 10 parameters
 #define ACTION_DECL(i, expr) const auto &_tmp##i{expr};
 #define ACTION_PRINT(i, x)                                                     \
-  std::cerr << printExprWithVal(#x, _tmp##i) << (i == 1 ? "\n" : "  ");
+  {                                                                            \
+    auto str = printExprWithVal(#x, _tmp##i);                                  \
+    if (!str.empty()) {                                                        \
+      std::cerr << "\033[36m" << str[0] << "\033[0m" << str.c_str() + 1;       \
+    }                                                                          \
+    std::cerr << (i == 1 ? "\n" : "  ");                                       \
+  }
 
 #define DEBUG(...)                                                             \
   do {                                                                         \
