@@ -1,8 +1,11 @@
 #include "json.hpp"
 #include <algorithm>
+#include <bitset>
+#include <climits>
 #include <cstdio>
 #include <iostream>
 #include <map>
+#include <queue>
 #include <set>
 #include <sstream>
 #include <string>

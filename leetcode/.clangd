@@ -1,0 +1,4 @@
+# If:
+#   PathMath: .*\.cpp
+CompileFlags:
+  Add: [-std=c++17, -DLOCAL_DBG, --gcc-install-dir=/usr/lib/gcc/x86_64-linux-gnu/13]
